@@ -34,7 +34,7 @@ brew install lookback
 
 `lookback [options] <source> <destination>`
 
-Optional flags:<br>
+Options:<br>
 `--version` : Print version<br>
 `-h` : Print this help message<br>
 `-v` : Verbose<br>
