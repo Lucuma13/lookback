@@ -34,15 +34,16 @@ brew install lookback
 
 `lookback [options] <source> <destination>`
 
-Optional flags:<br>
-`--version` : Print version<br>
-`-h` : Print help menu<br>
-`-v` : Verbose<br>
-`-i` : Ignore folder structure<br>
-`-y` : Side-by-side comparison<br>
-`-s` : Save a list of files of the source directory (on the destination directory)<br>
-`-H` : File comparison using specific hash function: xxHash-128 (default), md5<br>
-`-X` : Show hidden AppleDouble files<br>
+| Option | Description |
+| :---: | :--- |
+| `-i` | Ignore folder structure |
+| `-y` | Side-by-side comparison |
+| `-s` | Save a list of files of the source directory (on the destination directory) |
+| `-H` | File comparison using specific hash function: xxHash-128 (default), md5 |
+| `-X` | Show hidden AppleDouble files |
+| `-v` | Verbose |
+| `-h` | Show help message |
+| `--version` | Print version |
 
 #### 🤝 Acknowledgments
 
