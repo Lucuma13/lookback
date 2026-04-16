@@ -1,9 +1,5 @@
 # lookback
 
-A Bash utility to compare files and directories.
-
-#### 📋 Description
-
 `lookback` provides a fast way to verify data integrity and structural consistency. It supports:
 * File comparison: checksums (xxHash and MD5)
 * Directory comparison: filenames, file sizes, and optionally folder structure

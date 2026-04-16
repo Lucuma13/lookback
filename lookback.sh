@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# lookback - A Bash utility to compare files and directories.
+# lookback - Comparison tool for files and directories
 readonly LOOKBACK_VERSION="1.0"
 
 # Copyright (c) 2026 Luis Gómez Gutiérrez
