@@ -4,7 +4,7 @@
 * File comparison: checksums (xxHash and MD5)
 * Directory comparison: filenames, file sizes, and optionally folder structure
 
-#### 🛠 Dependencies
+### 🛠 Dependencies
 
 * [xxHash](https://github.com/Cyan4973/xxHash) © 2012-2026 Yann Collet (BSD 2-Clause)
 
