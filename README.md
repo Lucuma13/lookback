@@ -4,16 +4,13 @@
 * File comparison: checksums (xxHash and MD5)
 * Directory comparison: filenames, file sizes, and optionally folder structure
 
-#### 💻 Compatibility
-
-* macOS (BSD)
-* Linux (GNU)
-
 #### 🛠 Dependencies
 
 * [xxHash](https://github.com/Cyan4973/xxHash) © 2012-2026 Yann Collet (BSD 2-Clause)
 
-#### 🚀 Installation
+### 🚀 Installation
+
+##### macOS and Linux
 
 1. Install [Homebrew](https://brew.sh/) (if not already installed):
 ```
@@ -22,11 +19,11 @@
 
 2. Tap and install:
 ```
-brew tap lucuma13/homebrew-dit
+brew tap lucuma13/dit
 brew install lookback
 ```
 
-#### 📖 Usage
+### 📖 Usage
 
 `lookback [options] <source> <destination>`
 
@@ -41,6 +38,6 @@ brew install lookback
 | `-h` | Show help message |
 | `--version` | Print version |
 
-#### 🤝 Acknowledgments
+### 🤝 Acknowledgments
 
 A special thank you to Mohammad Ayyash for initiating me into the dark magic of Bash, and writing the first "molist" commands from which this utility evolved.
