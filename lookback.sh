@@ -1,13 +1,13 @@
 #!/bin/bash
 
 # lookback - Comparison tool for files and directories
-readonly LOOKBACK_VERSION="1.0"
+readonly VERSION="1.0"
 
 # Copyright (c) 2026 Luis Gómez Gutiérrez
 # This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
 function show_help() {
-	echo lookback v$LOOKBACK_VERSION. A Bash utility to compare files and directories.
+	echo lookback v$VERSION. A Bash utility to compare files and directories.
 	echo
 	echo "Usage: lookback [options] <source> <destination>"
 	echo
@@ -21,18 +21,17 @@ function show_help() {
 	echo "  -h : Show this help message"
 	echo "  --version : Print version"
 	echo
-	exit 0
 }
 
 function get_abs_path() {
-    local user_path="${1:-.}"
-    if [[ -d "$user_path" ]]; then
-        (cd "$user_path" && pwd)
-    elif [[ -f "$user_path" ]]; then
-        echo "$(cd "$(dirname "$user_path")" && pwd)/$(basename "$user_path")"
-    else
-        echo "$user_path"
-    fi
+	local user_path="${1:-.}"
+	if [[ -d "$user_path" ]]; then
+		(cd "$user_path" && pwd)
+	elif [[ -f "$user_path" ]]; then
+		echo "$(cd "$(dirname "$user_path")" && pwd)/$(basename "$user_path")"
+	else
+		echo "$user_path"
+	fi
 }
 
 # Options
@@ -44,36 +43,34 @@ hashfunction="xxhash-128"
 appledouble=false
 
 # Parse long-format flags
-[[ "$1" == "--version" ]] && { echo "$LOOKBACK_VERSION"; exit 0; }
-[[ "$1" == "--help" ]] && show_help
+case "$1" in
+--version) echo "$VERSION" ; exit 0 ;;
+--help|-h) show_help ; 	exit 0 ;;
+esac
 
 # Parse short-format flags
-while getopts "isyXH:vh" option
-do
+while getopts "isyXH:v" option; do
 	case $option in
-		i) ignore=true ;; #ignore folder structure
-		s) save=true ;;
-		y) sidebyside='-y' ;;
-		X) appledouble=true ;;
-		H) hashfunction=$OPTARG ;; #accepts "md5" and "xxHash" (default) as arguments
-		v) verbose=true ;;
-		h) show_help ;;
-		*) show_help ;;
+	i) ignore=true ;; #ignore folder structure
+	s) save=true ;;
+	y) sidebyside='-y' ;;
+	X) appledouble=true ;;
+	H) hashfunction=$OPTARG ;; #accepts "md5" and "xxHash" (default) as arguments
+	v) verbose=true ;;
+	*) echo "Error: Invalid option -$OPTARG" >&2 ; show_help ; exit 1 ;;
 	esac
 
 done
-shift "$((OPTIND-1))"
+shift "$((OPTIND - 1))"
 
 src=$(get_abs_path "$1")
 dest=$(get_abs_path "$2")
 srcname=$(basename "$1")
 destname=$(basename "$2")
 
-
 # Check input errors
-[[ -z "$src" || -z "$dest" ]] && { echo "Error: Source and destination required" && exit 1 ; }
-[ "$src" == "$dest" ] && { echo "Error: The two paths provided must be different" && exit 1 ; }
-
+[[ -z "$src" || -z "$dest" ]] && { echo "Error: Source and destination required" && exit 1; }
+[ "$src" == "$dest" ] && { echo "Error: The two paths provided must be different" && exit 1; }
 
 # Case-insensitive conversion for hashfunction
 hashfunction=$(echo "$hashfunction" | tr '[:upper:]' '[:lower:]')
@@ -82,23 +79,23 @@ hashfunction=$(echo "$hashfunction" | tr '[:upper:]' '[:lower:]')
 if [ -f "$src" ] && [ -f "$dest" ]; then
 	[[ $verbose == true ]] && echo "Comparing checksums of individual files..."
 	case $hashfunction in
-		md5)
-			if command -v md5 >/dev/null; then	# macOS/BSD
-				hash1=$(md5 -q "$src")
-				hash2=$(md5 -q "$dest")
-				else							# Linux/GNU
-				hash1=$(md5sum "$src" | cut -d " " -f 1)
-				hash2=$(md5sum "$dest" | cut -d " " -f 1)
-				fi
-			;;
-		xxhash-128|xxhash)
-			if ! command -v xxhsum >/dev/null; then
-				echo "Error: xxhsum not found. Please install xxHash or use md5 (see -h for help menu)." && exit 1
-			fi
-				hash1=$(xxhsum -H128 "$src" | cut -d " " -f 1)
-				hash2=$(xxhsum -H128 "$dest" | cut -d " " -f 1)
-			;;
-		*) echo "Unsupported hash provided: $hashfunction" && exit 1 ;;
+	md5)
+		if command -v md5 >/dev/null; then # macOS/BSD
+			hash1=$(md5 -q "$src")
+			hash2=$(md5 -q "$dest")
+		else # Linux/GNU
+			hash1=$(md5sum "$src" | cut -d " " -f 1)
+			hash2=$(md5sum "$dest" | cut -d " " -f 1)
+		fi
+		;;
+	xxhash-128 | xxhash)
+		if ! command -v xxhsum >/dev/null; then
+			echo "Error: xxhsum not found. Please install xxHash or use md5 (see -h for help menu)." && exit 1
+		fi
+		hash1=$(xxhsum -H128 "$src" | cut -d " " -f 1)
+		hash2=$(xxhsum -H128 "$dest" | cut -d " " -f 1)
+		;;
+	*) echo "Unsupported hash provided: $hashfunction" && exit 1 ;;
 	esac
 
 	if [ "$hash1" == "$hash2" ]; then
@@ -110,7 +107,7 @@ if [ -f "$src" ] && [ -f "$dest" ]; then
 # --- Directory comparison ---
 elif [ -d "$src" ] && [ -d "$dest" ]; then
 	#Define exclusion patterns (including AppleDouble files)
-	find_exclude=( -type f
+	find_exclude=(-type f
 		! -iname ".DS_Store"
 		! -path "*/.Trashes*"
 		! -path "*/.Spotlight-V100*"
@@ -121,7 +118,7 @@ elif [ -d "$src" ] && [ -d "$dest" ]; then
 		#! -path "*/Cache*"
 		#! -path "*/Caches*"
 	)
-	[[ $appledouble == false ]] && find_exclude+=( ! -iname "._*" )
+	[[ $appledouble == false ]] && find_exclude+=(! -iname "._*")
 
 	#Define 'stat' flags for portability (detect GNU vs BSD stat)
 	if stat --help 2>&1 | grep -q "GNU"; then
@@ -131,7 +128,6 @@ elif [ -d "$src" ] && [ -d "$dest" ]; then
 		# BSD Stat (default macOS)
 		stat_portable=(stat -f "%N %% %z")
 	fi
-
 
 	#Define sorting logic (optionally ignoring folder structure)
 	sorting_process="sort"
@@ -147,7 +143,7 @@ elif [ -d "$src" ] && [ -d "$dest" ]; then
 
 	#Execution
 	if [[ $save == true ]]; then
-		(cd "$src" && find . "${find_exclude[@]}" -exec "${stat_portable[@]}" {} + | eval "$sorting_process") > "$dest/molist_$srcname.log"
+		(cd "$src" && find . "${find_exclude[@]}" -exec "${stat_portable[@]}" {} + | eval "$sorting_process") >"$dest/molist_$srcname.log"
 		echo "File list saved to $dest/molist_$srcname.log"
 	else
 		diff $sidebyside \
