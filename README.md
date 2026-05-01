@@ -2,10 +2,10 @@
 
 `lookback` is a file and directory comparison tool. It answers two related questions:
 
-* **"Are these two files identical?"** Hashes both files and compares the digests.
-* **"Are these two directories identical?"** Either compares the file names and sizes (default fast mode), or hashes every file and compares the digests (deep mode). Optional `-i` flag ignores folder structure to focus exclusively on files (useful when directories have been moved around or renamed).
+* "Are these two files the same?" Hashes both files and compares the digests.
+* "Do these two directories contain the same files?" Either compares file names and sizes (default), or hashes every file and compares the digests (full comparison mode). Optional `-i` flag ignores folder structure to focus exclusively on files (useful when directories have been moved around or renamed).
 
-It's cross-platform tool (macOS / Linux / Windows) written in [Python](https://www.python.org/) and integrating the [xxhash](https://github.com/ifduyue/python-xxhash) package for high-throughput checksumming. Other algorithms are available via the `-a` flag (MD5, SHA-256, Blake and more!). 
+This is a cross-platform tool (macOS / Linux / Windows) written in [Python](https://www.python.org/) and integrating the [xxhash](https://github.com/ifduyue/python-xxhash) package for high-throughput hashing. 
 
 ### 🚀 Installation
 
