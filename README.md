@@ -27,14 +27,14 @@ lookback path/to/file_a path/to/file_b
 
 Compare two directories:
 
-```bash
+```
 lookback <source> <destination>               # metadata only (filenames and file sizes)
 lookback -f <source> <destination>            # full comparison mode: hash every file
 lookback -i <source> <destination>            # ignore folder structure
 ```
 
 Check that the destination contains all of the files from the source:
-```bash
+```
 lookback path/to/source/ path/to/destination/ | grep "<"
 ```
 
