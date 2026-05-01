@@ -28,9 +28,9 @@ lookback path/to/file_a path/to/file_b
 Compare two directories:
 
 ```bash
-lookback path/to/source/ path/to/destination/               # metadata only (filenames and file sizes)
-lookback -f path/to/source/ path/to/destination/            # deep mode: hash every file
-lookback -i path/to/source/ path/to/destination/            # ignore folder structure
+lookback <source> <destination>               # metadata only (filenames and file sizes)
+lookback -f <source> <destination>            # full comparison mode: hash every file
+lookback -i <source> <destination>            # ignore folder structure
 ```
 
 Check that the destination contains all of the files from the source:
@@ -38,7 +38,7 @@ Check that the destination contains all of the files from the source:
 lookback path/to/source/ path/to/destination/ | grep "<"
 ```
 
-Output uses a `diff`-like format. Lines starting with `<` are unique to the source side, `>` lines are unique to the destination side, and identical entries are omitted:
+Output uses a `diff`-like format. Lines starting with `<` are unique to the source side, `>` lines are unique to the destination side:
 
 ```
 $ lookback photos_2024/ photos_backup_2024/
@@ -48,12 +48,11 @@ $ echo $?
 1
 ```
 
-Other options:
+Other options (run `lookback --help` for full list):
   ```
-    -d, --deep           : deep mode: hash every file (slower but safer)
-    -i, --ignore         : ignore folder structure (compare flat list of file names and sizes)
-    -a, --algorithm ALGO : hash algorithm (default: xxh128 if installed, else blake2b;
-                           also: md5, sha1, sha256, blake2b, blake2s)
-    -s, --save           : save listing of source under destination
-    -X, --appledouble    : include AppleDouble (._*) files
+    -f, --full                     : deep mode: hash every file (slower but safer)
+    -i, --ignore                   : ignore folder structure (compare flat list of file names and sizes)
+    -a, --algorithm [xxh64|xxh128] : hash algorithm (default: xxh64)
+    -s, --save                     : save listing for manual comparison
+    -X, --appledouble              : include AppleDouble (._*) files
   ```

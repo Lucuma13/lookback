@@ -2,12 +2,11 @@
 """
 `lookback` is a file and directory comparison tool. It answers two related questions:
 
-  1. "Are these two FILES identical?" Hashes both files and compares the digests.
-
-  2. "Are these two DIRECTORIES identical?" Either compares the file names and sizes (default
-  fast mode), or hashes every file and compares the digests (full comparison mode). Optional `-i` flag
-  ignores folder structure to focus exclusively on files (useful when directories have been
-  moved around or renamed).
+* _Are these two files the same?_ Hashes both files and compares the digests.
+* _Do these two directories contain the same files?_ Either compares file names and sizes
+(default), or hashes every file and compares the digests (full comparison mode). Optional
+`-i` flag ignores folder structure to focus exclusively on files (useful when directories
+have been moved around or renamed).
 
   Examples:
     1. Compare two files:
@@ -19,9 +18,9 @@
     2. Compare two directories:
 
 ```bash
-    lookback path/to/source/ path/to/destination/               # metadata only (filenames and file sizes)
-    lookback -f path/to/source/ path/to/destination/            # deep mode: hash every file
-    lookback -i path/to/source/ path/to/destination/            # ignore folder structure
+    lookback <source> <destination>        # metadata only (filenames and file sizes)
+    lookback -f <source> <destination>     # full comparison mode: hash every file
+    lookback -i <source> <destination>     # ignore folder structure
 ```
 
     3. Check that the destination contains all of the files from the source:
@@ -291,6 +290,35 @@ def diff_sorted(a, b):
 
 
 # ---------------------------------------------------------------------------
+# Save listings to TSV
+# ---------------------------------------------------------------------------
+def _write_listing(name: str, listing: list, full: bool, ignore: bool) -> None:
+    """Write a TSV listing for one directory to cwd."""
+    out = Path.cwd() / f"molist_{name}.tsv"
+    col_header = "hash" if full else "size"
+    path_header = "filename" if ignore else "filepath"
+    try:
+        with open(out, "w", encoding="utf-8") as f:
+            f.write(f"{col_header}\t{path_header}\n")
+            for tup in listing:
+                f.write(f"{tup[0]}\t{tup[1]}\n")
+        print(f"Listing saved to {out}")
+    except OSError as e:
+        sys.exit(f"error: could not write to current directory: {e}")
+
+
+def cmd_save(src: Path, a: list, dest: Path | None, b: list | None, args) -> int:
+    """Save TSV listings for source (and optionally destination) to cwd."""
+    cwd = Path.cwd()
+    if not os.access(cwd, os.W_OK):
+        sys.exit(f"error: current directory is not writable: {cwd}")
+    _write_listing(src.name, a, args.full, args.ignore)
+    if dest is not None and b is not None:
+        _write_listing(dest.name, b, args.full, args.ignore)
+    return 0
+
+
+# ---------------------------------------------------------------------------
 # Top-level commands (file vs file, directory vs directory)
 # ---------------------------------------------------------------------------
 def cmd_compare_files(src: Path, dest: Path, algo: str) -> int:
@@ -306,25 +334,23 @@ def cmd_compare_files(src: Path, dest: Path, algo: str) -> int:
     return 1
 
 
-def cmd_compare_dirs(src: Path, dest: Path, args) -> int:
+def cmd_compare_dirs(src: Path, dest: Path | None, args) -> int:
     """
     Compare two directory trees.
     """
     if args.full:
         a = list_full(str(src), args.algorithm, args.appledouble, args.ignore)
-        b = list_full(str(dest), args.algorithm, args.appledouble, args.ignore)
+        b = list_full(str(dest), args.algorithm, args.appledouble, args.ignore) if dest else None
     else:
         a = list_metadata(str(src), args.ignore, args.appledouble)
-        b = list_metadata(str(dest), args.ignore, args.appledouble)
+        b = list_metadata(str(dest), args.ignore, args.appledouble) if dest else None
 
-    # Save the source listing (aka "molist") as a log file inside the destination with `-s` flag
     if args.save:
-        out = dest / f"molist_{src.name}.tsv"
-        with open(out, "w", encoding="utf-8") as f:
-            for tup in a:
-                f.write(f"{tup[1]}\n")
-        print(f"File list saved to {out}")
-        return 0
+        return cmd_save(src, a, dest, b, args)
+
+    if dest is None:
+        sys.exit("error: destination is required for comparison. "
+                 "Use -s to save a listing without a destination.")
 
     diffs = list(diff_sorted(a, b))
 
@@ -398,7 +424,16 @@ def main(argv=None):
     args.algorithm = normalise_algorithm(args.algorithm)
 
     src  = Path(args.source).resolve()
-    dest = Path(args.destination).resolve()
+    dest = Path(args.destination).resolve() if args.destination else None
+
+    # Single-path invocation: only valid with -s
+    if dest is None:
+        if not args.save:
+            sys.exit("error: destination is required for comparison. "
+                     "Use -s to save a listing without a destination.")
+        if not src.is_dir():
+            sys.exit("error: source must be a directory when using -s without a destination.")
+        return cmd_compare_dirs(src, None, args)
 
     if src == dest:
         sys.exit("Error: source and destination must be different")
