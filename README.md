@@ -13,7 +13,7 @@ This is a cross-platform tool (macOS / Linux / Windows) written in [Python](http
 
 2. Install the tool:
 
-```
+```bash
 uv tool install lookback
 ```
 
@@ -21,7 +21,7 @@ uv tool install lookback
 
 Compare two files:
 
-```bash
+```
 lookback <file1> <file2>
 ```
 
