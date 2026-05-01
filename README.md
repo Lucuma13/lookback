@@ -35,7 +35,7 @@ lookback -i <source> <destination>            # ignore folder structure
 
 Check that the destination contains all of the files from the source:
 ```
-lookback path/to/source/ path/to/destination/ | grep "<"
+lookback <source> <destination> | grep "<"
 ```
 
 Output uses a `diff`-like format. Lines starting with `<` are unique to the source side, `>` lines are unique to the destination side:
