@@ -22,7 +22,7 @@ uv tool install lookback
 Compare two files:
 
 ```bash
-lookback path/to/file_a path/to/file_b
+lookback <file1> <file2>
 ```
 
 Compare two directories:
