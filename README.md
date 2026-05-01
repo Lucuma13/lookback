@@ -41,11 +41,9 @@ lookback path/to/source/ path/to/destination/ | grep "<"
 Output uses a `diff`-like format. Lines starting with `<` are unique to the source side, `>` lines are unique to the destination side:
 
 ```
-$ lookback photos_2024/ photos_backup_2024/
+$ lookback /Volumes/PRJ_MST01 /Volumes/PRJ_BAK01
 < 1432891  IMG_0421.dng
 > 1432891  IMG_0422.dng
-$ echo $?
-1
 ```
 
 Other options (run `lookback --help` for full list):
