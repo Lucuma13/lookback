@@ -54,3 +54,7 @@ Other options (run `lookback --help` for full list):
     -s, --save                     : save listing for manual comparison
     -X, --appledouble              : include AppleDouble (._*) files
   ```
+
+### 🤝 Acknowledgments
+
+A special thank you to Mohammad Ayyash for initiating me into the dark magic of Python and Bash, and writing the first "molist" commands from which this utility evolved.

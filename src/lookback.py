@@ -12,7 +12,7 @@ have been moved around or renamed).
     1. Compare two files:
 
 ```bash
-    lookback path/to/file_a path/to/file_b
+    lookback <file1> <file2>
 ```
 
     2. Compare two directories:
@@ -25,7 +25,7 @@ have been moved around or renamed).
 
     3. Check that the destination contains all of the files from the source:
 ```bash
-    lookback path/to/source/ path/to/destination/ | grep "<"
+    lookback <source> <destination> | grep "<"
 ```
 """
 # Copyright (c) 2026 Luis Gómez Gutiérrez. License: MIT.
