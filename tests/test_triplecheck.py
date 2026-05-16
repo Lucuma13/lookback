@@ -1239,7 +1239,7 @@ class TestEmptyDirectories:
         make_file(src / "subdir" / "info.txt", b"info")
         assert run(str(src), str(dest)) == 1
         out = capsys.readouterr().out
-        assert "subdir/info.txt" in out
+        assert f"subdir{os.sep}info.txt" in out
         diff_lines = [l.strip() for l in out.splitlines()]
         assert not any(l.endswith("subdir/") for l in diff_lines)
 
@@ -1252,7 +1252,7 @@ class TestEmptyDirectories:
         make_file(src / "SUB" / "data.bin", b"content")
         assert run("-f", str(src), str(dest)) == 1
         out = capsys.readouterr().out
-        assert "SUB/data.bin" in out
+        assert f"SUB{os.sep}data.bin" in out
         diff_lines = [l.strip() for l in out.splitlines()]
         assert not any(l.endswith("SUB/") for l in diff_lines)
 
@@ -1266,8 +1266,8 @@ class TestEmptyDirectories:
         make_file(src / "batch" / "b.txt", b"bbb")
         assert run(str(src), str(dest)) == 1
         out = capsys.readouterr().out
-        assert "batch/a.txt" in out
-        assert "batch/b.txt" in out
+        assert f"batch{os.sep}a.txt" in out
+        assert f"batch{os.sep}b.txt" in out
         diff_lines = [l.strip() for l in out.splitlines()]
         assert not any(l.endswith("batch/") for l in diff_lines)
 
@@ -1310,7 +1310,7 @@ class TestEmptyDirectories:
         make_file(src / "a" / "b" / "deep.txt", b"deep")
         assert run(str(src), str(dest)) == 1
         out = capsys.readouterr().out
-        assert "a/b/deep.txt" in out
+        assert f"a{os.sep}b{os.sep}deep.txt" in out
         diff_lines = [l.strip() for l in out.splitlines()]
         assert not any(l.endswith("a/") for l in diff_lines)
         assert not any(l.endswith("a/b/") for l in diff_lines)
@@ -1328,7 +1328,7 @@ class TestEmptyDirectories:
         make_file(src / "shared" / "file.txt", b"data")
         assert run(str(src), str(dest)) == 1
         out = capsys.readouterr().out
-        assert "shared/file.txt" in out
+        assert f"shared{os.sep}file.txt" in out
         assert "orphan/" in out
         diff_lines = [l.strip() for l in out.splitlines()]
         assert not any(l.endswith("shared/") for l in diff_lines)
@@ -1350,7 +1350,7 @@ class TestEmptyDirectories:
         # dest2/subdir is empty
         assert run(str(src), str(dest1), str(dest2)) == 1
         out = capsys.readouterr().out
-        assert "subdir/info.txt" in out
+        assert f"subdir{os.sep}info.txt" in out
         diff_lines = [l.strip() for l in out.splitlines()]
         assert not any(l.endswith("subdir/") for l in diff_lines)
 
@@ -1365,7 +1365,7 @@ class TestEmptyDirectories:
         make_file(dest1 / "SUB" / "file.bin", b"data")
         assert run("-f", str(src), str(dest1), str(dest2)) == 1
         out = capsys.readouterr().out
-        assert "SUB/file.bin" in out
+        assert f"SUB{os.sep}file.bin" in out
         diff_lines = [l.strip() for l in out.splitlines()]
         assert not any(l.endswith("SUB/") for l in diff_lines)
 
@@ -1386,7 +1386,7 @@ class TestEmptyDirectories:
         # dest2 has no "shared" at all — file.txt is missing
         assert run(str(src), str(dest1), str(dest2)) == 1
         out = capsys.readouterr().out
-        assert "shared/file.txt" in out
+        assert f"shared{os.sep}file.txt" in out
         # src and dest1 share the dir, so no standalone dir marker for them
         diff_lines = [l.strip() for l in out.splitlines()]
         assert not any(l.endswith("shared/") for l in diff_lines)
@@ -1411,7 +1411,7 @@ class TestEmptyDirectories:
         make_file(dest1 / "a" / "b" / "deep.txt", b"deep")
         assert run(str(src), str(dest1), str(dest2)) == 1
         out = capsys.readouterr().out
-        assert "a/b/deep.txt" in out
+        assert f"a{os.sep}b{os.sep}deep.txt" in out
         diff_lines = [l.strip() for l in out.splitlines()]
         assert not any(l.endswith("a/") for l in diff_lines)
         assert not any(l.endswith("a/b/") for l in diff_lines)
