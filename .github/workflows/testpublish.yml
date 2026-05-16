@@ -3,14 +3,43 @@ name: Publish to TestPyPI
 on:
   push:
     tags:
-      - '[0-9]*' # Triggers on tags starting with a number (e.g., 2.0.0, 2.0.0-test1)
+- '[0-9]*[ab]*' # Triggers on pre-release version tags (e.g., 2.0.0a1, 2.0.0b2)
 
 jobs:
+  # JOB 1: Pre-Deployment Validation (Safety Gate)
+  run-unit-tests:
+    name: Unit Tests (${{ matrix.os }}, Python ${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8.1.0
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies and test framework
+        run: uv pip install --system -e .[test] || uv pip install --system pytest
+
+      - name: Run test suite
+        run: pytest
+
+  # JOB 2: Deployment (Only runs if Job 1 passes)
   build-n-publish:
     name: Build and publish Python distro to TestPyPI
+    needs: run-unit-tests
     runs-on: ubuntu-latest
 
-    # Crucial for OIDC trusted publishing authentication
     permissions:
       id-token: write
       contents: read
@@ -36,3 +65,42 @@ jobs:
 
       - name: Publish to TestPyPI via uv
         run: uv publish --publish-url https://test.pypi.org/legacy/
+
+  # JOB 3: Post-Deployment Smoke Test (Verifies index installation and packaging)
+  verify-deployment:
+    name: Verify Live Package (${{ matrix.os }})
+    needs: build-n-publish
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8.1.0
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version-file: "pyproject.toml"
+
+      - name: Delay execution for index propagation
+        if: runner.os != 'Windows'
+        run: sleep 30
+
+      - name: Delay execution for index propagation (Windows)
+        if: runner.os == 'Windows'
+        run: Start-Sleep -Seconds 30
+
+      - name: Install testing framework and deployed package
+        run: |
+          uv pip install --system pytest
+          uv pip install --system --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ triplecheck
+
+      - name: Execute unit test suite
+        run: |
+          cd tests/
+          pytest
