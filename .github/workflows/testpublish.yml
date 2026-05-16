@@ -1,0 +1,38 @@
+name: Publish to TestPyPI
+
+on:
+  push:
+    tags:
+      - 'v*' # Triggers the workflow whenever you push a version tag like v2.0.0
+
+jobs:
+  build-n-publish:
+    name: Build and publish Python distro to TestPyPI
+    runs-on: ubuntu-latest
+
+    # Crucial for OIDC trusted publishing authentication
+    permissions:
+      id-token: write
+      contents: read
+
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/p/triplecheck
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8.1.0
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version-file: "pyproject.toml"
+
+      - name: Build binary wheels and source tarball
+        run: uv build
+
+      - name: Publish to TestPyPI via uv
+        run: uv publish --publish-url https://test.pypi.org/legacy/
