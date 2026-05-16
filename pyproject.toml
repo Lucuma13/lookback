@@ -1,28 +1,28 @@
 [build-system]
-requires = ["flit_core >=3.2,<4"]
+requires = ["flit_core>=3.12"]
 build-backend = "flit_core.buildapi"
 
 [project]
-name = "lookback"
-version = "1.1.0"
-description = "Comparison tool for files and directories."
+name = "triplecheck"
+dynamic = ["version"]
+description = "Two- or three-way comparison tool for files and directories"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [
     { name = "Luis Gómez Gutiérrez" },
 ]
 keywords = [
+    "media-management",
     "diff",
     "compare",
     "verification",
     "checksum",
     "hash",
     "xxhash",
-    "blake2",
-    "media-management",
     "backup-verification",
     "directory-diff",
+    "metadata",
 ]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
@@ -33,20 +33,50 @@ classifiers = [
     "Operating System :: POSIX :: Linux",
     "Operating System :: Microsoft :: Windows",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
-    "Topic :: System :: Archiving :: Backup",
-    "Topic :: System :: Filesystems",
+    "Topic :: Multimedia :: Video",
     "Topic :: Utilities",
 ]
 dependencies = [
-    "xxhash>=3.0"
+    "blake3>=1.0.8",
+    "xxhash>=3.7.0",
 ]
 
 [project.scripts]
-lookback = "lookback:main"
+triplecheck = "triplecheck:main"
+
+[tool.flit.module]
+name = "triplecheck"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+addopts = "--cov=src --cov-report=term-missing"
+
+[tool.ruff]
+line-length = 120
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "B", "C", "PTH", "ANN", "FURB", "UP"]
+ignore = [
+    "C901",     # complexity: walk_tree and cmd_compare_dirs are intentionally dense
+    "FBT001",   # bool positional args: internal helpers, not public API
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*.py" = ["ANN", "E702", "E741"]
+
+[tool.ty.src]
+include = ["src", "tests"]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "ruff",
+    "ty",
+]
