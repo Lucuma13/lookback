@@ -28,8 +28,11 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install dependencies and test framework
-        run: uv pip install --system -e .[test] || uv pip install --system pytest
+      - name: Install local package and testing tools
+        # Clean, sequential installation. If either fails, the job breaks immediately.
+        run: |
+          uv pip install --system pytest
+          uv pip install --system -e .
 
       - name: Run test suite
         run: pytest
@@ -98,7 +101,11 @@ jobs:
       - name: Install testing framework and deployed package
         run: |
           uv pip install --system pytest
-          uv pip install --system --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ triplecheck
+          uv pip install --system \
+          --index-url https://test.pypi.org/simple/ \
+          --extra-index-url https://pypi.org/simple/ \
+          --prerelease allow \
+          triplecheck
 
       - name: Execute unit test suite
         run: |
