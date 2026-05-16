@@ -11,11 +11,13 @@ import os
 from pathlib import Path
 
 import pytest
+
 import triplecheck
 
 # ---------------------------------------------------------------------------
 # Low-level helper (also importable from tests via conftest)
 # ---------------------------------------------------------------------------
+
 
 def make_file(path: Path, content: bytes = b"hello world") -> Path:
     path.write_bytes(content)
@@ -30,9 +32,11 @@ def make_file(path: Path, content: bytes = b"hello world") -> Path:
 def file_a(tmp_path):
     return make_file(tmp_path / "file_a.txt", b"identical content")
 
+
 @pytest.fixture
 def file_b_identical(tmp_path):
     return make_file(tmp_path / "file_b.txt", b"identical content")
+
 
 @pytest.fixture
 def file_b_different(tmp_path):
@@ -336,7 +340,6 @@ class TestDiffThree:
         assert entry[1] == "b.txt"
 
 
-
 # ---------------------------------------------------------------------------
 # Unit tests for diff_sorted() — the two-way merge kernel used by --diff
 # ---------------------------------------------------------------------------
@@ -400,6 +403,7 @@ class TestDiffSorted:
         sigils = [s for s, _ in result]
         assert sigils.count("<") == 2
         assert sigils.count(">") == 2
+
 
 class TestSymbol:
     """Unit tests for _symbol()."""
@@ -1817,6 +1821,7 @@ class TestStress:
 # New tests targeting previously uncovered lines
 # ---------------------------------------------------------------------------
 
+
 class TestWalkTreeExcludedNames:
     """Lines 128-129: EXCLUDED_NAMES filter inside walk_tree."""
 
@@ -1982,7 +1987,7 @@ class TestHashFileBlake3:
         """A file larger than the 1 MiB chunk size must hash identically to
         a direct in-memory blake3 call on the same bytes."""
         import blake3 as _b3
-        data = b"x" * (3 << 20)   # 3 MiB — forces multiple chunks
+        data = b"x" * (3 << 20)  # 3 MiB — forces multiple chunks
         f = make_file(tmp_path / "large.bin", data)
         expected = _b3.blake3(data).hexdigest()
         assert triplecheck.hash_file(str(f), "blake3") == expected
