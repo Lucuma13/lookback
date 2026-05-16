@@ -38,7 +38,7 @@ from pathlib import Path
 import blake3 as _blake3
 import xxhash as _xxhash
 
-__version__ = "2.0.0a3"
+__version__ = "2.0.0a4"
 
 # ---------------------------------------------------------------------------
 # Type aliases
