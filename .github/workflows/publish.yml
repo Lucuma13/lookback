@@ -1,12 +1,12 @@
-name: Publish to TestPyPI
+name: Publish to PyPI
 
 on:
   push:
     tags:
-      - '[0-9]+.[0-9]+.[0-9]+a[0-9]+'  # alpha releases only (e.g. 2.0.0a1)
+      - '[0-9]+.[0-9]+.[0-9]+' # Triggers on final release version tags (e.g., 2.0.0, 2.1.0)
 
 concurrency:
-  group: testpypi-publish
+  group: pypi-publish
   cancel-in-progress: true
 
 jobs:
@@ -54,7 +54,7 @@ jobs:
 
   # JOB 2: Deployment (Only runs if Job 1 passes)
   build-n-publish:
-    name: Build and publish Python distro to TestPyPI
+    name: Build and publish Python distro to PyPI
     needs: run-unit-tests
     runs-on: ubuntu-latest
 
@@ -63,8 +63,8 @@ jobs:
       contents: read
 
     environment:
-      name: testpypi
-      url: https://test.pypi.org/p/triplecheck
+      name: pypi
+      url: https://pypi.org/p/triplecheck
 
     steps:
       - name: Checkout source code
@@ -83,8 +83,8 @@ jobs:
       - name: Build binary wheels and source tarball
         run: uv build
 
-      - name: Publish to TestPyPI via uv
-        run: uv publish --publish-url https://test.pypi.org/legacy/
+      - name: Publish to PyPI via uv
+        run: uv publish
 
   # JOB 3: Post-Deployment Smoke Test (Verifies index installation and packaging)
   verify-deployment:
@@ -112,8 +112,7 @@ jobs:
         run: Start-Sleep -Seconds 30
 
       - name: Install deployed package
-        run: |
-          uv pip install --system --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ --prerelease allow triplecheck
+        run: uv pip install --system triplecheck
 
       - name: Smoke test
         run: triplecheck --version
